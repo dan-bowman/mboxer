@@ -1,31 +1,15 @@
 from datetime import datetime
+from numpy import isnan
 
 
 # An email object stores values from the "From", "Subject", and "Date" fields of exported mbox
 class Email:
-    def __init__(self, from_field, subject_field, date_field):
+    def __init__(self, from_field, subject_field, date_field, content_field):
         self.__from = from_field
         self.__subject = subject_field
         self.__date = date_field
 
-    def get_from(self):
-        return self.__from
-
-    def get_subject(self):
-        return self.__subject
-
-    def get_date(self):
-        return self.__date
-
-    def get_datetime(self):
-        # Datetime format:
-        # Tue, 10 Sep 2013 10:05:45 -0600
-        #  |   |  |   /   /  /  /   /
-        # '%a, %d %b %Y %H:%M:%S %z'
-        return datetime.strptime(self.__date, '%a, %d %b %Y %H:%M:%S %z')
-
-    def get_domain(self):
-        line = self.__from.split()
+        line = str(self.__from).split()
         email_address = line[-1].strip('<').strip('>')
 
         # Store whatever is after the @ symbol in the From field
@@ -41,7 +25,33 @@ class Email:
         else:
             domain = split_domain[-2] + "." + split_domain[-1]
 
-        return domain
+        self.__email_address = email_address
+        self.__domain = domain
+        self.__content = content_field
+
+    def get_from(self):
+        return self.__from
+
+    def get_subject(self):
+        return self.__subject
+
+    def get_date(self):
+        return self.__date
+
+    def get_datetime(self):
+        # Tue, 10 Sep 2013 10:05:45 is 25 characters
+        mod_date = str(self.__date)[:26]
+        d = datetime.strptime(mod_date, '%a, %d %b %Y %H:%M:%S')
+        return d
+
+    def get_domain(self):
+        return self.__domain
+
+    def get_email_address(self):
+        return self.__email_address
+    
+    def get_body_content(self):
+        return self.__content
 
     def __str__(self):
         return 'Domain: ' + self.get_domain() + '\nSubject: ' + self.get_subject() + '\n\tDate: ' + self.get_date() + '\n'
